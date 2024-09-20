@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Células de Baterias</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 15px;
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .result h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .result ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .result ul li {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculadora de Células de Baterias</h1>
+
+    <label for="tensao">Tensão Total do Pack de Baterias (V):</label>
+    <input type="number" id="tensao" step="0.01" placeholder="Ex: 36">
+
+    <label for="capacidade">Capacidade Total do Pack de Baterias (Ah):</label>
+    <input type="number" id="capacidade" step="0.01" placeholder="Ex: 10">
+
+    <button onclick="calcular()">Calcular</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        function calcular() {
+            // Obter os valores de entrada
+            var tensaoTotal = parseFloat(document.getElementById('tensao').value);
+            var capacidadeTotal = parseFloat(document.getElementById('capacidade').value);
+
+            // Especificações das células
+            var tensaoEve = 3.6; // Tensão nominal da célula EVE
+            var capacidadeEve = 2.55; // Capacidade em Ah da célula EVE
+            var tensaoSamsung = 3.6; // Tensão nominal da célula Samsung
+            var capacidadeSamsung = 3.5; // Capacidade em Ah da célula Samsung
+            var precoSamsung = 75.00; // Preço fixo da célula Samsung
+
+            // Função para determinar o preço das células EVE de acordo com a tabela
+            function calcularPrecoEve(totalCelulas) {
+                if (totalCelulas >= 1000) {
+                    return 23.50;
+                } else if (totalCelulas >= 400) {
+                    return 24.50;
+                } else if (totalCelulas >= 300) {
+                    return 25.00;
+                } else if (totalCelulas >= 200) {
+                    return 26.00;
+                } else if (totalCelulas >= 100) {
+                    return 27.00;
+                } else if (totalCelulas >= 50) {
+                    return 31.00;
+                } else {
+                    return 39.00; // Menos de 50 unidades
+                }
+            }
+
+            // Cálculos para a célula EVE
+            var celulasSerieEve = Math.ceil(tensaoTotal / tensaoEve);
+            var celulasParaleloEve = Math.ceil(capacidadeTotal / capacidadeEve);
+            var totalCelulasEve = celulasSerieEve * celulasParaleloEve;
+            var precoEve = calcularPrecoEve(totalCelulasEve);
+            var custoTotalEve = totalCelulasEve * precoEve;
+
+            // Cálculos para a célula Samsung
+            var celulasSerieSamsung = Math.ceil(tensaoTotal / tensaoSamsung);
+            var celulasParaleloSamsung = Math.ceil(capacidadeTotal / capacidadeSamsung);
+            var totalCelulasSamsung = celulasSerieSamsung * celulasParaleloSamsung;
+            var custoTotalSamsung = totalCelulasSamsung * precoSamsung;
+
+            // Cálculo da tensão e capacidade final da bateria
+            var tensaoFinalEve = celulasSerieEve * tensaoEve;
+            var capacidadeFinalEve = celulasParaleloEve * capacidadeEve;
+
+            var tensaoFinalSamsung = celulasSerieSamsung * tensaoSamsung;
+            var capacidadeFinalSamsung = celulasParaleloSamsung * capacidadeSamsung;
+
+            // Exibir resultados
+            var resultado = `
+                <h2>Resultados:</h2>
+                <p><strong>Células EVE:</strong></p>
+                <ul>
+                    <li>Quantidade de células em série: ${celulasSerieEve}</li>
+                    <li>Quantidade de células em paralelo: ${celulasParaleloEve}</li>
+                    <li>Total de células: ${totalCelulasEve}</li>
+                    <li>Preço unitário (EVE): R$ ${precoEve.toFixed(2)}</li>
+                    <li>Custo total: R$ ${custoTotalEve.toFixed(2)}</li>
+                    <li>Tensão final do pack: ${tensaoFinalEve.toFixed(2)} V</li>
+                    <li>Capacidade final do pack: ${capacidadeFinalEve.toFixed(2)} Ah</li>
+                </ul>
+                <p><strong>Células Samsung:</strong></p>
+                <ul>
+                    <li>Quantidade de células em série: ${celulasSerieSamsung}</li>
+                    <li>Quantidade de células em paralelo: ${celulasParaleloSamsung}</li>
+                    <li>Total de células: ${totalCelulasSamsung}</li>
+                    <li>Custo total: R$ ${custoTotalSamsung.toFixed(2)}</li>
+                    <li>Tensão final do pack: ${tensaoFinalSamsung.toFixed(2)} V</li>
+                    <li>Capacidade final do pack: ${capacidadeFinalSamsung.toFixed(2)} Ah</li>
+                </ul>
+            `;
+
+            document.getElementById('result').innerHTML = resultado;
+        }
+    </script>
+</body>
+</html>
